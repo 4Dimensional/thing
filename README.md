@@ -9,3 +9,4 @@ make
 ```
 ./main
 ```
+Not the most pretty code, just whipped it up in 1 day and not expecting to expand it. Just thought it might be interesting.
