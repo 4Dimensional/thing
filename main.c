@@ -1,3 +1,4 @@
+// Library
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,12 +6,14 @@
 #include <curl/curl.h>
 #include <cjson/cJSON.h>
 
+// not important
 struct MemoryStruct
 {
 	char*  memory;
 	size_t size;
 };
 
+// do something
 static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp)
 {
 	size_t				 realsize = size * nmemb;
@@ -31,6 +34,7 @@ static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, voi
 	return realsize;
 }
 
+// why is this here?
 char* replace_char(char* str, char find, char replace)
 {
 	char* current_pos = strchr(str, find);
@@ -42,6 +46,8 @@ char* replace_char(char* str, char find, char replace)
 	return str;
 }
 
+// Takes an item, a unix timestamp, and a output file and writes the prices to it in CSV format
+// Why did I name it this?
 void GetFromTime(unsigned long int timestamp, unsigned int item_id, const char* filename)
 {
 	char URL[1024] = "https://prices.runescape.wiki/api/v1/osrs/1h?timestamp=";
@@ -134,19 +140,21 @@ void GetFromTime(unsigned long int timestamp, unsigned int item_id, const char* 
 	curl_global_cleanup();
 }
 
+// Convert unix timesteps to times that wiki api can handle
 unsigned long int ConvertTo5M(unsigned long int t) { return t - (t % 300) - 300; }
 unsigned long int ConvertTo1H(unsigned long int t) { return t - (t % 3600) - 3600; }
 
+// an important comment
 int main(int argc, char* argv[])
 {
-	const char*		   CSV_NAME	 = "data.csv";
-	const unsigned int ITEM_ID	 = 9243;
-	unsigned long int  TIMESTAMP = (unsigned long int) time(NULL);
-	unsigned long int  PAST_TIME = 1615733400;
-	unsigned int	   TIME_STEP = 3600 * 24;
+	const char*		   CSV_NAME	 = "data.csv"; // output file name
+	const unsigned int ITEM_ID	 = 9243; // Item id (diamond bolts (e) that i lost all my money on)
+	unsigned long int  TIMESTAMP = (unsigned long int) time(NULL); // End recording time
+	unsigned long int  PAST_TIME = 1615733400; // Start recording time
+	unsigned int	   TIME_STEP = 3600 * 24; // 3600 = 1 hr, so this makes it step forward a day every iteration
 
 	unsigned long int TIMESTAMP_START = ConvertTo1H(PAST_TIME);
-	unsigned long int TIMESTAMP_5M	  = ConvertTo1H(TIMESTAMP);
+	unsigned long int TIMESTAMP_5M	  = ConvertTo1H(TIMESTAMP); // I named this before i created the 1H function
 
 	printf("Starting: %lu\nEnding: %lu\n", TIMESTAMP_START, TIMESTAMP_5M);
 
@@ -154,11 +162,13 @@ int main(int argc, char* argv[])
 	fprintf(returnFile, "time;highprice;lowprice;\n");
 	fclose(returnFile);
 
+	// loop through two periods of time and put the wiki data in the file
 	for (unsigned long int i = TIMESTAMP_START; i < TIMESTAMP_5M; i += TIME_STEP)
 	{
 		GetFromTime(i, ITEM_ID, CSV_NAME);
 	}
 
+	// hooray!
 	printf("Complete!\n");
 
 	return 0;
